@@ -3,10 +3,7 @@
  *
  *       Filename:  main.c
  *
- *    Description:  Main function for simulating diffusion equation using FFTW. This
- *                  version of the program tracks the value of point A as a function 
- *                  of time. A is the bottom right corner of the grid such that
- *                  x = 3/4 gridDimX and y = gridDimY/4.
+ *    Description:  Main function for simulating diffusion equation using FFTW.
  *
  *        Version:  1.0
  *        Created:  04/14/2016 11:15:02 AM
@@ -24,13 +21,16 @@
 #include "grid.h"
 #include "mpi_utils.h"
 #include "mpi.h"
-#include "time_utils.h"
 
 int main(int argc, char *argv[]) {
 	
 	initMPI(argc, argv) ;
 	int gridDimX = 8 ; // Grid dimension X must be divisable by 4.
 	int gridDimY = 8 ; // Grid dimension Y must be divisable by 4.
+	int mutliFlag = 0 ; // 1 = Print every timestep of size finalTime/numIters.
+	int numTimeSteps = 100 ; // Number of timesteps to be printed. 
+	double finalTime = 1 ; // The time to evolve the system until. 
+	int benchmark = 0 ; // Enable benchmarking "Outputs time"
 	int choice;
 	while (1) {
 		choice = getopt( argc, argv, "n:m:pi:t:b");
@@ -43,9 +43,18 @@ int main(int argc, char *argv[]) {
 			case 'm':
 				gridDimX = atoi(optarg) ;
 				break;
+			case 'p':
+				mutliFlag = 1 ;
+				break;
+			case 'i':
+				numTimeSteps = atoi(optarg) ;
+				break;
+			case 't':
+				finalTime = atof(optarg) ;
+				break;
 			default:
 				// Not sure how to get here... 
-				printf("USAGE ./diff -n YDIM -m XDIM \n") ; 
+				printf("USAGE ./diff -n YDIM -m XDIM -t FINALTIME OPTIONAL[ -p OUTPUT-TIMESTEPS -i NUMBER TIMESTEPS TO OUTPUT]\n") ;
 				return EXIT_FAILURE;
 		}
 	}
@@ -61,7 +70,7 @@ int main(int argc, char *argv[]) {
 	
 	Grid * grid = makeNewGrid(gridDimX,gridDimY) ;
 	initialiseGrid(grid) ;
-	simulateGrid(grid) ;
+	simulateGrid(grid,numTimeSteps,finalTime,mutliFlag) ;
 	freeGrid(grid) ;
 	MPI_Finalize() ;
 

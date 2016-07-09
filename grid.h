@@ -44,7 +44,7 @@ typedef struct Grid {
 Grid * makeNewGrid(int,int) ; 
 void initialiseGrid(Grid *) ;
 void printGrid(Grid *, FILE *) ;
-void simulateGrid(Grid *) ;
+void simulateGrid(Grid *,int, double, int) ;
 void freeGrid(Grid *) ;
 
 #endif /* end of include guard: GRID_H_6JLKZ8VN */
